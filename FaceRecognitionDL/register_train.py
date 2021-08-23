@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*- 
+
 # USAGE
 # python ./FaceRecognitionDL/register_train.py --dataset ./FaceRecognitionDL/dataset --embeddings ./FaceRecognitionDL/output/embeddings.pickle \
 #        --detector ./FaceRecognitionDL/face_detection_model --embedding_model ./FaceRecognitionDL/openface_nn4.small2.v1.t7 \
@@ -57,7 +59,7 @@ detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
 print("[INFO] loading face recognizer...")
 embedder = cv2.dnn.readNetFromTorch(args["embedding_model"])
 
-# 데이터셋 입력 이미지 목록에 대한 경로
+# 데이터셋 입력 이미지 목록에 대한 경로  => 얼굴 데이터 가져오기 
 print("[INFO] quantifying faces...")
 imagePaths = list(paths.list_images(args["dataset"]))
 
