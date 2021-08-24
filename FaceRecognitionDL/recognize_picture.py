@@ -1,6 +1,6 @@
 # USAGE
-# python ./FaceRecognitionDL/recognize.py --detector ./FaceRecognitionDL/face_detection_model \
-# 	--embedding_model ./FaceRecognitionDL/openface_nn4.small2.v1.t7 \
+# python ./FaceRecognitionDL/recognize_picture.py --detector ./FaceRecognitionDL/face_detection_model \
+# 	--embedding_model ./FaceRecognitionDL/face_detection_model/openface_nn4.small2.v1.t7 \
 # 	--recognizer ./FaceRecognitionDL/output/recognizer.pickle \
 # 	--le ./FaceRecognitionDL/output/le.pickle --image ./FaceRecognitionDL/images/patrick_bateman.jpg
 

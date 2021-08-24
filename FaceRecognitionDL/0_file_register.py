@@ -36,3 +36,6 @@ for i in range(records.count_documents({})):
         # 이미지 저장
         idx_str = str(j)
         image.save(f'./FaceRecognitionDL/dataset/{label_str}/image_{idx_str}.png')
+
+        # 콘솔 확인용
+        print(f'./FaceRecognitionDL/dataset/{label_str}/image_{idx_str}.png'+' 저장완료')
