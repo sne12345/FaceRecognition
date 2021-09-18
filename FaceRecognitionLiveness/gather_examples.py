@@ -2,7 +2,7 @@
 
 # USAGE
 # python ./FaceRecognitionLiveness/gather_examples.py --input ./FaceRecognitionLiveness/videos/real.mov --output ./FaceRecognitionLiveness/dataset/real --detector ./FaceRecognitionLiveness/face_detector --skip 1
-# python ./FaceRecognitionLiveness/gather_examples.py --input ./FaceRecognitionLiveness/videos/fake.mp4 --output ./FaceRecognitionLiveness/dataset/fake --detector ./FaceRecognitionLiveness/face_detector --skip 4
+# python ./FaceRecognitionLiveness/gather_examples.py --input ./FaceRecognitionLiveness/videos/fake_NewMask_valid.MOV --output ./FaceRecognitionLiveness/dataset/fake_val --detector ./FaceRecognitionLiveness/face_detector --skip 4
 
 # import the necessary packages
 import numpy as np
@@ -28,7 +28,7 @@ net = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
 # 비디오 파일 스트림 초기화
 vs = cv2.VideoCapture(args["input"])
 read = 0
-saved = 0
+saved = 154
 
 # 비디오 파일 스트림 프레임 반복
 while True:
@@ -69,6 +69,7 @@ while True:
 
 			# 프레임 쓰기
 			p = os.path.sep.join([args["output"], "{}.png".format(saved)])
+			# print(face)
 			cv2.imwrite(p, face)
 			saved += 1
 			print("[INFO] saved {} to disk".format(p))
