@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 # USAGE
-# python ./FaceRecognitionMask/mask_demo.py --model ./FaceRecognitionMask/DenseNet121.h5 --le ./FaceRecognitionMask/le.pickle --detector ./FaceRecognitionMask/face_detector
+# python ./FaceRecognitionMask/mask_demo.py --model ./FaceRecognitionMask/DenseNet121_100.h5 --le ./FaceRecognitionMask/le.pickle --detector ./FaceRecognitionMask/face_detector
 
 # import the necessary packages
 from imutils.video import VideoStream
