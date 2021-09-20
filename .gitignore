@@ -2,6 +2,7 @@
 *.png
 *.jpg
 *.jpeg
+
 /logs/fit/**
 FaceRecognitionLiveness/videos/fake_NewMask_train.MOV
 FaceRecognitionLiveness/videos/fake_NewMask_valid.MOV
