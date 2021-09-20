@@ -1,5 +1,6 @@
 # USAGE
 # python ./FaceRecognitionLiveness/train_liveness.py --dataset ./FaceRecognitionLiveness/dataset --model ./FaceRecognitionLiveness/liveness.model --le ./FaceRecognitionLiveness/le.pickle
+from datetime import datetime
 
 import matplotlib
 matplotlib.use("Agg")
@@ -12,6 +13,10 @@ from sklearn.metrics import classification_report
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.callbacks import Callback, EarlyStopping
+import tensorboard
+import tensorflow as tf
+from tensorflow import keras
 from imutils import paths
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,7 +34,7 @@ ap.add_argument("-p", "--plot", type=str, default="plot.png", help="path to outp
 args = vars(ap.parse_args())
 
 # 학습 할 초기 학습 속도, 배치 크기 및 에포크 수를 초기화
-INIT_LR = 1e-4
+INIT_LR = 1e-5
 BS = 8
 EPOCHS = 100
 
@@ -37,28 +42,44 @@ EPOCHS = 100
 print("[INFO] loading images...")
 imagePaths = list(paths.list_images(args["dataset"]))
 data = []
+data_val = []
 labels = []
+labels_val = []
 
 for imagePath in imagePaths:
 	# 파일 이름에서 클래스 레이블을 추출하고 이미지를 로드한 다음, 32x32 크기 조정
 	label = imagePath.split(os.path.sep)[-2]
+	
 	image = cv2.imread(imagePath)
 	image = cv2.resize(image, (32, 32))
 
 	# 데이터 및 라벨 목록을 각각 업데이트
-	data.append(image)
-	labels.append(label)
+	if label == 'real_val':
+		data_val.append(image)
+		labels_val.append('real')
+	elif label == 'fake_val':
+		data_val.append(image)
+		labels_val.append('fake')
+	else:
+		data.append(image)
+		labels.append(label)
+
 
 # 데이터를 NumPy 배열로 변환 한 다음 모든 픽셀 강도를 [0, 1] 범위로 스케일링하여 전처리
 data = np.array(data, dtype="float") / 255.0
+data_val = np.array(data_val, dtype="float") / 255.0
+
 
 # 레이블을 정수로 인코딩 한 다음 One-Hot 인코딩
 le = LabelEncoder()
 labels = le.fit_transform(labels)
 labels = to_categorical(labels, 2)
+le = LabelEncoder()
+labels_val = le.fit_transform(labels_val)
+labels_val = to_categorical(labels_val, 2)
 
 # 훈련용 데이터와 테스트 데이터의 분할을 75:25로 분할
-(trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.25, random_state=42)
+(trainX, testX, trainY, testY) = data, data_val, labels, labels_val
 
 # 데이터 확장 위한 학습 이미지 생성기 구성
 aug = ImageDataGenerator(rotation_range=20, zoom_range=0.15,
@@ -71,11 +92,24 @@ opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model = LivenessNet.build(width=32, height=32, depth=3, classes=len(le.classes_))
 model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"])
 
+# Define the Keras TensorBoard callback.
+logdir="logs\\fit\\" + datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
+
+# early stopping
+early_stopping = EarlyStopping(
+    monitor='val_loss', 
+    min_delta=0,
+    patience=10, # 10번의 epoch 동안 val_loss이 더 이상 줄어들지 않을 때 훈련을 멈춤
+    verbose=1,
+    mode='min',
+    restore_best_weights=True)
+
 # 딥러닝 학습
 print("[INFO] training network for {} epochs...".format(EPOCHS))
 H = model.fit(x=aug.flow(trainX, trainY, batch_size=BS),
 	validation_data=(testX, testY), steps_per_epoch=len(trainX) // BS,
-	epochs=EPOCHS)
+	epochs=EPOCHS,callbacks=[tensorboard_callback,early_stopping])
 
 # 학습 평가
 print("[INFO] evaluating network...")
