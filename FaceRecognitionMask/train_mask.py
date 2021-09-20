@@ -1,6 +1,5 @@
 # USAGE
-# python ./FaceRecognitionLiveness/train_liveness.py --dataset ./FaceRecognitionLiveness/dataset --model ./FaceRecognitionLiveness/liveness.model --le ./FaceRecognitionLiveness/le.pickle
-
+# python ./FaceRecognitionMask/train_mask.py --dataset ./FaceRecognitionMask/dataset --model ./FaceRecognitionMask/mask.model --le ./FaceRecognitionMask/le.pickle
 
 import cv2
 import inspect
@@ -24,21 +23,28 @@ ap.add_argument("-l", "--le", type=str, required=True, help="path to label encod
 ap.add_argument("-p", "--plot", type=str, default="plot.png", help="path to output loss/accuracy plot")
 args = vars(ap.parse_args())
 
+import numpy as np
+import pandas as pd
+
+import os
+# for dirname, _, filenames in os.walk('./FaceRecognitionMask/dataset'):
+#     for filename in filenames:
+#         print(os.path.join(dirname, filename))
 
 # 마스크 착용된 사진들의 디렉토리 모음
-with_mask_dirs = ['/opt/ml/kaggle/input/face-mask-12k-images-dataset/Train/WithMask', 
-                  '/opt/ml/kaggle/input/face-mask-12k-images-dataset/Validation/WithMask',
-                  '/opt/ml/kaggle/input/face-mask-12k-images-dataset/Test/WithMask',
-                  '/opt/ml/kaggle/input/covid-face-mask-detection-dataset/Train/Mask',
-                  '/opt/ml/kaggle/input/covid-face-mask-detection-dataset/Validation/Mask',
-                  '/opt/ml/kaggle/input/covid-face-mask-detection-dataset/Test/Mask']
+with_mask_dirs = ['./FaceRecognitionMask/dataset/Face Mask Dataset/Train/WithMask', 
+                  './FaceRecognitionMask/dataset/Face Mask Dataset/Validation/WithMask',
+                  './FaceRecognitionMask/dataset/Face Mask Dataset/Test/WithMask',
+                  './FaceRecognitionMask/dataset/New Masks Dataset/Train/Mask',
+                  './FaceRecognitionMask/dataset/New Masks Dataset/Validation/Mask',
+                  './FaceRecognitionMask/dataset/New Masks Dataset/Test/Mask']
 # 마스크 미착용된 사진들의 디렉토리 모음
-without_mask_dirs = ['/opt/ml/kaggle/input/face-mask-12k-images-dataset/Train/WithoutMask',
-                     '/opt/ml/kaggle/input/face-mask-12k-images-dataset/Validation/WithoutMask',
-                     '/opt/ml/kaggle/input/face-mask-12k-images-dataset/Test/WithoutMask',
-                     '/opt/ml/kaggle/input/covid-face-mask-detection-dataset/Train/Non Mask',
-                     '/opt/ml/kaggle/input/covid-face-mask-detection-dataset/Validation/Non Mask',
-                     '/opt/ml/kaggle/input/covid-face-mask-detection-dataset/Test/Non Mask']
+without_mask_dirs = ['./FaceRecognitionMask/dataset/Face Mask Dataset/Train/WithoutMask',
+                     './FaceRecognitionMask/dataset/Face Mask Dataset/Validation/WithoutMask',
+                     './FaceRecognitionMask/dataset/Face Mask Dataset/Test/WithoutMask',
+                     './FaceRecognitionMask/dataset/New Masks Dataset/Train/Non Mask',
+                     './FaceRecognitionMask/dataset/New Masks Dataset/Validation/Non Mask',
+                     './FaceRecognitionMask/dataset/New Masks Dataset/Test/Non Mask']
 
 # 사진들의 디렉토리와 타겟 값을 dataframe으로 묶음
 def folder_to_df(dirs, labels):
@@ -62,7 +68,7 @@ train_df, val_df, test_df = np.split(shuffled_mask_df,
 
 # train, validation, test 세트 확인
 print('total dataset : {}\ntraining set  : {}\nvalidation set: {}\ntest set      : {}'.format(all_mask_df.shape, train_df.shape, val_df.shape, test_df.shape))
-display(train_df.head(5), val_df.head(5), test_df.head(5))
+# display(train_df.head(5), val_df.head(5), test_df.head(5))
 
 train_datagen = ImageDataGenerator(rotation_range=10, # 기울어진 얼굴
                                    zoom_range=0.1, # 확대된 얼굴

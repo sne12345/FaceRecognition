@@ -1,0 +1,6 @@
+# image files #
+*.png
+*.jpg
+*.jpeg
+logs/
+/logs/fit/
